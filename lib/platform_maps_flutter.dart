@@ -1,6 +1,7 @@
 library platform_maps_flutter;
 
 import 'dart:io';
+import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:apple_maps_flutter/apple_maps_flutter.dart' as appleMaps;

@@ -55,6 +55,13 @@ class LatLng {
     });
     return appleMapsLatLngs;
   }
+
+  @override
+  bool operator ==(Object other) {
+    return other is LatLng &&
+        other.latitude == latitude &&
+        other.longitude == longitude;
+  }
 }
 
 class LatLngBounds {
@@ -109,4 +116,66 @@ class LatLngBounds {
       return southwest.longitude <= lng || lng <= northeast.longitude;
     }
   }
+
+  @override
+  bool operator ==(Object other) {
+    return other is LatLngBounds &&
+        other.northeast == northeast &&
+        other.southwest == southwest;
+  }
+
+  LatLngBounds pad(double bufferRatio) {
+    final heightBuffer =
+        (southwest.latitude - northeast.latitude).abs() * bufferRatio;
+    final widthBuffer =
+        (southwest.longitude - northeast.longitude).abs() * bufferRatio;
+
+    return LatLngBounds(
+        southwest: LatLng(southwest.latitude - heightBuffer,
+            southwest.longitude - widthBuffer),
+        northeast: LatLng(northeast.latitude + heightBuffer,
+            northeast.longitude + widthBuffer));
+  }
+
+  factory LatLngBounds.fromPoints(List<LatLng> points) {
+    if (points.isNotEmpty) {
+      num? minX;
+      num? maxX;
+      num? minY;
+      num? maxY;
+
+      for (final point in points) {
+        final num x = degToRadian(point.longitude);
+        final num y = degToRadian(point.latitude);
+
+        if (minX == null || minX > x) {
+          minX = x;
+        }
+
+        if (minY == null || minY > y) {
+          minY = y;
+        }
+
+        if (maxX == null || maxX < x) {
+          maxX = x;
+        }
+
+        if (maxY == null || maxY < y) {
+          maxY = y;
+        }
+      }
+
+      final _sw =
+          LatLng(radianToDeg(minY as double), radianToDeg(minX as double));
+      final _ne =
+          LatLng(radianToDeg(maxY as double), radianToDeg(maxX as double));
+      return LatLngBounds(southwest: _sw, northeast: _ne);
+    } else {
+      throw Exception();
+    }
+  }
 }
+
+double degToRadian(final double deg) => deg * (pi / 180.0);
+
+double radianToDeg(final double rad) => rad * (180.0 / pi);

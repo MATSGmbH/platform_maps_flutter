@@ -110,6 +110,14 @@ class PlatformMapController {
     return _bounds;
   }
 
+  Future<double?> getZoomLevel() async {
+    if (Platform.isIOS) {
+      return await this.appleController!.getZoomLevel();
+    } else if (Platform.isAndroid) {
+      return await this.googleController!.getZoomLevel();
+    }
+  }
+
   /// Returns the image bytes of the map
   Future<Uint8List?> takeSnapshot() async {
     if (Platform.isIOS) {
